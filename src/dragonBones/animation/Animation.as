@@ -259,7 +259,7 @@
 			switch(fadeOutMode)
 			{
 				case NONE:
-					break;
+                    break;
 				
 				case SAME_LAYER:
 					i = _animationStateList.length;
@@ -268,7 +268,7 @@
 						animationState = _animationStateList[i];
 						if(animationState.layer == layer)
 						{
-							animationState.fadeOut(fadeInTime, pauseFadeOut);
+							fadeOutState(animationState, fadeInTime, pauseFadeOut);
 						}
 					}
 					break;
@@ -280,7 +280,7 @@
 						animationState = _animationStateList[i];
 						if(animationState.group == group)
 						{
-							animationState.fadeOut(fadeInTime, pauseFadeOut);
+							fadeOutState(animationState, fadeInTime, pauseFadeOut);
 						}
 					}
 					break;
@@ -290,7 +290,7 @@
 					while(i --)
 					{
 						animationState = _animationStateList[i];
-						animationState.fadeOut(fadeInTime, pauseFadeOut);
+						fadeOutState(animationState, fadeInTime, pauseFadeOut);
 					}
 					break;
 				
@@ -302,7 +302,7 @@
 						animationState = _animationStateList[i];
 						if(animationState.layer == layer && animationState.group == group )
 						{
-							animationState.fadeOut(fadeInTime, pauseFadeOut);
+							fadeOutState(animationState, fadeInTime, pauseFadeOut);
 						}
 					}
 					break;
@@ -331,7 +331,7 @@
 			
 			return _lastAnimationState;
 		}
-		
+        
 		/**
 		 * Control the animation to stop with a specified time. If related animationState haven't been created, then create a new animationState.
 		 * @param animationName The name of the animationState.
@@ -514,5 +514,24 @@
 				_animationStateCount = _animationStateList.length;
 			}
 		}
+        
+		/**
+		 * Fade out the animation state.  If fadeOutTime==0, remove instantly
+		 * @param animationState
+		 * @param fadeOutTime 
+		 * @param pauseFadeOut pause the animation before fade out complete
+		 */
+        private function fadeOutState(animationState:AnimationState, fadeOutTime:Number, pauseFadeOut:Boolean):void
+        {
+            if (fadeOutTime == 0)
+            {
+                removeState(animationState);
+            }
+            else
+            {
+                animationState.fadeOut(fadeOutTime, pauseFadeOut);
+            }
+        }
+		
 	}
 }

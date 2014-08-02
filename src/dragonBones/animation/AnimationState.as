@@ -290,7 +290,6 @@
 		{
 			_armature = armature;
 			_clip = clip;
-			_pausePlayheadInFade = pausePlayhead;
 			
 			_name = _clip.name;
 			_totalTime = _clip.duration;
@@ -319,12 +318,22 @@
 			
 			//fade start
 			_isFadeOut = false;
-			_fadeWeight = 0;
 			_fadeTotalWeight = 1;
-			_fadeState = -1;
-			_fadeCurrentTime = 0;
-			_fadeBeginTime = _fadeCurrentTime;
-			_fadeTotalTime = fadeTotalTime * _timeScale;
+            if (fadeTotalTime == 0)
+            {
+                _fadeWeight = _fadeTotalWeight;
+                _fadeState = 1;
+    			_pausePlayheadInFade = false;
+            }
+            else
+            {
+                _fadeWeight = 0;
+                _fadeState = -1;
+                _fadeCurrentTime = 0;
+                _fadeBeginTime = _fadeCurrentTime;
+                _fadeTotalTime = fadeTotalTime * _timeScale;
+    			_pausePlayheadInFade = pausePlayhead;
+            }
 			
 			//default
 			_isPlaying = true;
@@ -354,7 +363,6 @@
 			{
 				fadeTotalTime = 0;
 			}
-			_pausePlayheadInFade = pausePlayhead;
 			
 			if(_isFadeOut)
 			{
@@ -365,7 +373,7 @@
 					return this;
 				}
 			}
-			else
+			else if (fadeTotalTime != 0)
 			{
 				//第一次淡出
 				//The first time to fade out.
@@ -378,10 +386,20 @@
 			//fade start
 			_isFadeOut = true;
 			_fadeTotalWeight = _fadeWeight;
-			_fadeState = -1;
-			_fadeBeginTime = _fadeCurrentTime;
-			_fadeTotalTime = _fadeTotalWeight >= 0?fadeTotalTime * _timeScale:0;
-			
+            if (fadeTotalTime == 0)
+            {
+                _fadeWeight = 0;
+                _fadeState = 1;
+                _pausePlayheadInFade = false;
+            }
+            else
+            {
+                _fadeState = -1;
+                _fadeBeginTime = _fadeCurrentTime;
+                _fadeTotalTime = _fadeTotalWeight >= 0?fadeTotalTime * _timeScale:0;
+    			_pausePlayheadInFade = pausePlayhead;
+			}
+
 			//default
 			displayControl = false;
 			
@@ -844,7 +862,8 @@
 		private function updateMainTimeline(isThisComplete:Boolean):void
 		{
 			var frameList:Vector.<Frame> = _clip.frameList;
-			if(frameList.length > 0)
+            var frameListLength:int = frameList.length;
+			if(frameListLength > 0)
 			{
 				var prevFrame:Frame;
 				var currentFrame:Frame;
@@ -858,7 +877,7 @@
 					else if(_currentTime >= _currentFramePosition + _currentFrameDuration)
 					{
 						_currentFrameIndex ++;
-						if(_currentFrameIndex >= frameList.length)
+						if(_currentFrameIndex >= frameListLength)
 						{
 							if(isThisComplete)
 							{
@@ -877,7 +896,7 @@
 						_currentFrameIndex --;
 						if(_currentFrameIndex < 0)
 						{
-							_currentFrameIndex = frameList.length - 1;
+							_currentFrameIndex = frameListLength - 1;
 						}
 						currentFrame = frameList[_currentFrameIndex];
 					}
